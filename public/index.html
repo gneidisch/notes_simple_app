@@ -25,7 +25,8 @@
       <div class="note_form">
         <form>
           <div class="form-group">
-            <input type="text" class="form-control input-lg" placeholder="Enter text..." ng-model="formData.subject">
+              <input type="text" class="form-control input-lg" placeholder="Subject" ng-model="formData.subject">
+              <textarea id="textareaEdit" placeholder="Body" ng-model="formData.body"></textarea>
           </div>
           <button type="submit" class="btn btn-primary btn-lg" ng-click="createNote()">Add</button>
         </form>

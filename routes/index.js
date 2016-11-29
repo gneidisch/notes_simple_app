@@ -20,7 +20,7 @@ router.get('/', (req, res, next) => {
 router.post('/api/v1/notes', (req, res, next) => {
     const results = [];
     // Grab data from http request
-    const data = {subject: req.body.subject, body: ""};
+    const data = {subject: req.body.subject, body: req.body.body};
     // Get a Postgres client from the connection pool
     pg.connect(connectionString, (err, client, done) => {
         // Handle connection errors
@@ -31,7 +31,7 @@ router.post('/api/v1/notes', (req, res, next) => {
         }
 
         // SQL Query > Insert Data
-        client.query('INSERT INTO t_note(subject, body) values($1, $2)',
+        client.query('INSERT INTO t_note(subject, body, note_version) values($1, $2, 1)',
         [data.subject, data.body]);
  
         // SQL Query > Select Data
@@ -98,7 +98,7 @@ router.put('/api/v1/notes/:note_id', (req, res, next) => {
         [data.subject, data.body, id]);
         
         // SQL Query > Select Data
-        const query = client.query("SELECT * FROM t_note ORDER BY id ASC");
+        const query = client.query('SELECT * FROM t_note ORDER BY id ASC');
         // Stream results back one row at a time
         query.on('row', (row) => {
             results.push(row);

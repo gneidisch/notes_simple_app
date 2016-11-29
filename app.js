@@ -8,8 +8,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 
-//const connectionString = /*process.env.DATABASE_URL ||*/ 'postgres://dbuser1:dbuser1@localhost:5432/coma01';
-
 var index = require('./routes/index');
 var users = require('./routes/users');
 

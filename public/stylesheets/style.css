@@ -22,3 +22,14 @@ ul {
 .header {
   text-align: center;
 }
+
+input {
+  width: 380px;
+  vertical-align: middle;
+}
+
+textarea {
+  width: 360px;
+  height: 180px;
+  vertical-align: middle;
+}
