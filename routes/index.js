@@ -78,12 +78,10 @@ router.get('/api/v1/notes', (req, res, next) => {
 });
 
 
-router.put('/api/v1/notes/:note_id', (req, res, next) => {
+// put - update a note
+router.put('/api/v1/notes/:note_id/:note_body', (req, res, next) => {
     const results = [];
-    // Grab data from the URL parameters
-    const id = req.params.note_id;
-    // Grab data from http request
-    const data = {subject: req.body.suject, body: req.body.body};
+    const data = {id: req.params.note_id, body: req.params.note_body};
     // Get a Postgres client from the connection pool
     pg.connect(connectionString, (err, client, done) => {
         // Handle connection errors
@@ -94,8 +92,8 @@ router.put('/api/v1/notes/:note_id', (req, res, next) => {
         }
 
         // SQL Query > Update Data
-        client.query('UPDATE t_note SET subject=($1), body=($2), note_version=note_version+1 WHERE id=($3)',
-        [data.subject, data.body, id]);
+        client.query('UPDATE t_note SET body=($1), note_version=note_version+1 WHERE id=($2)',
+        [data.body, data.id]);
         
         // SQL Query > Select Data
         const query = client.query('SELECT * FROM t_note ORDER BY id ASC');
@@ -113,6 +111,7 @@ router.put('/api/v1/notes/:note_id', (req, res, next) => {
 });
 
 
+// delete - delete a note
 router.delete('/api/v1/notes/:note_id', (req, res, next) => {
     const results = [];
     // Grab data from the URL parameters

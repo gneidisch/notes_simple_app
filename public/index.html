@@ -26,7 +26,7 @@
         <form>
           <div class="form-group">
               <input type="text" class="form-control input-lg" placeholder="Subject" ng-model="formData.subject">
-              <textarea id="textareaEdit" placeholder="Body" ng-model="formData.body"></textarea>
+              <textarea placeholder="Body" ng-model="formData.body"></textarea>
           </div>
           <button type="submit" class="btn btn-primary btn-lg" ng-click="createNote()">Add</button>
         </form>
@@ -34,7 +34,15 @@
       <br>
       <div class="note_list">
         <ul ng-repeat="note in myNoteList">
-          <li><h3><input class="lead" type="checkbox" ng-click="deleteNote(note.id)">&nbsp;{{ note.subject }}</h3></li><hr>
+          <li><h3><a href="#" ng-click="showDetails = ! showDetails">{{ note.subject }}</a></h3>
+              <button type="submit" class="btn btn-secondary btn-lg" ng-click="deleteNote(note.id)">Delete</button>
+              <form>
+              <div class="note-details" ng-show="showDetails">
+                  <textarea data-ng-model="note.body"></textarea>
+                  <button type="submit" class="btn btn-primary btn-lg" ng-click="updateNote(note.id, note.body)">Update</button>
+              </div>
+              </form>
+          </li><hr>
         </ul>
       </div>
     </div>
