@@ -1,7 +1,7 @@
 # notes_simple_app
 
 Requirements:
-- NodeJS
+- NodeJS, npm
 - PostgressSql
 
 Steps:
@@ -11,3 +11,7 @@ Steps:
 4 - run "node models/database.js" to initialize the database
 5 - run "npm install" to resolve dependencies
 6 - run "npm start" to start the application
+
+TODO:
+- create a utility script file with db-calls and such
+
