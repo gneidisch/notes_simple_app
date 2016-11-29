@@ -31,11 +31,12 @@ router.post('/api/v1/notes', (req, res, next) => {
         }
 
         // SQL Query > Insert Data
-        client.query('INSERT INTO t_note(subject, body, note_version) values($1, $2, 1)',
-        [data.subject, data.body]);
+
+        client.query('WITH NOTE AS ( INSERT INTO t_note(subject) VALUES($1) RETURNING * ) INSERT INTO t_note_version(t_note_id, body, note_version, created) SELECT note.id, $2, 1, now() FROM NOTE;',
+            [data.subject, data.body]);
  
         // SQL Query > Select Data
-        const query = client.query('SELECT * FROM t_note ORDER BY id ASC');
+        const query = client.query('SELECT n.id, n.subject, nv.body, nv.note_version, nv.created FROM t_note n, t_note_version nv WHERE n.id = nv.t_note_id and nv.id = (SELECT MAX(id) FROM t_note_version WHERE t_note_id = n.id) ORDER BY n.id ASC;');
         // Stream results back one row at a time
         query.on('row', (row) => {
             results.push(row);
@@ -63,7 +64,7 @@ router.get('/api/v1/notes', (req, res, next) => {
         }
  
         // SQL Query > Select Data
-        const query = client.query('SELECT * FROM t_note ORDER BY id ASC;');
+        const query = client.query('SELECT n.id, n.subject, nv.body, nv.note_version, nv.created FROM t_note n, t_note_version nv WHERE n.id = nv.t_note_id and nv.id = (SELECT MAX(id) FROM t_note_version WHERE t_note_id = n.id) ORDER BY n.id ASC;');
         // Stream results back one row at a time
         query.on('row', (row) => {
             results.push(row);
@@ -91,12 +92,12 @@ router.put('/api/v1/notes/:note_id/:note_body', (req, res, next) => {
             return res.status(500).json({success: false, data: err});
         }
 
-        // SQL Query > Update Data
-        client.query('UPDATE t_note SET body=($1), note_version=note_version+1 WHERE id=($2)',
-        [data.body, data.id]);
+        // SQL Query > Create a new version of the note
+        client.query('INSERT INTO t_note_version (t_note_id, body, note_version, created) VALUES ($1, $2, (SELECT MAX(t1.note_version)+1 FROM t_note_version t1 WHERE t1.t_note_id = $3), now());',
+            [data.id, data.body, data.id]);
         
         // SQL Query > Select Data
-        const query = client.query('SELECT * FROM t_note ORDER BY id ASC');
+        const query = client.query('SELECT n.id, n.subject, nv.body, nv.note_version, nv.created FROM t_note n, t_note_version nv WHERE n.id = nv.t_note_id and nv.id = (SELECT MAX(id) FROM t_note_version WHERE t_note_id = n.id) ORDER BY n.id ASC;');
         // Stream results back one row at a time
         query.on('row', (row) => {
             results.push(row);
@@ -126,10 +127,11 @@ router.delete('/api/v1/notes/:note_id', (req, res, next) => {
         }
 
         // SQL Query > Delete Data
+        client.query('DELETE FROM t_note_version WHERE t_note_id=($1)', [id]);
         client.query('DELETE FROM t_note WHERE id=($1)', [id]);
 
         // SQL Query > Select Data
-        var query = client.query('SELECT * FROM t_note ORDER BY id ASC');
+        var query = client.query('SELECT n.id, n.subject, nv.body, nv.note_version, nv.created FROM t_note n, t_note_version nv WHERE n.id = nv.t_note_id and nv.id = (SELECT MAX(id) FROM t_note_version WHERE t_note_id = n.id) ORDER BY n.id ASC;');
         // Stream results back one row at a time
         query.on('row', (row) => {
             results.push(row);
