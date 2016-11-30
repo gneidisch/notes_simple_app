@@ -14,4 +14,9 @@ Steps:
 
 TODO:
 - create a utility script file with db-calls and such
+- use a single configuration file, it is cumbersome to go changing database access variables in all-scattered files
+- improve sql-queries
+- user-authentication!!
+- include Sequelize!!
+- unit testing!!
 
