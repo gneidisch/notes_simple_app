@@ -11,13 +11,52 @@ const path = require('path');
   //res.render('index', { title: 'Express' });
 //});
 
-router.get('/', (req, res, next) => {
-    res.sendFile('index.html');
+module.exports = function(app, passport) {
+app.get('/', (req, res, next) => {
+    //res.sendFile('index.html');
+    res.render('index.ejs');
 });
 
 
+//authentication
+app.get('/login', function(req, res) {
+        
+        res.render('login.ejs', { message: req.flash('loginMessage') });
+});
+
+app.get('/signup', function(req, res) {
+        
+        res.render('signup.ejs', { message: req.flash('signupMessage') });
+});
+
+app.post('/signup', passport.authenticate('local-signup', {
+        successRedirect : '/profile', // redirect to the secure profile section
+        failureRedirect : '/signup', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+}));
+
+
+app.get('/profile', isLoggedIn, function(req, res) {
+        res.render('profile.ejs', {
+                   user : req.user // get the user out of session and pass to template
+        });
+});
+
+app.get('/logout', function(req, res) {
+        req.logout();
+        res.redirect('/');
+});
+    
+
+
+
+
+
+////////  NOTES handling
+
+
 // post - create new note
-router.post('/api/v1/notes', (req, res, next) => {
+app.post('/api/v1/notes', (req, res, next) => {
     const results = [];
     // Grab data from http request
     const data = {subject: req.body.subject, body: req.body.body};
@@ -52,7 +91,7 @@ router.post('/api/v1/notes', (req, res, next) => {
 
 
 // get - get'em all notes
-router.get('/api/v1/notes', (req, res, next) => {
+app.get('/api/v1/notes', (req, res, next) => {
     const results = [];
     // Get a Postgres client from the connection pool
     pg.connect(connectionString, (err, client, done) => {
@@ -80,7 +119,7 @@ router.get('/api/v1/notes', (req, res, next) => {
 
 
 // put - update a note
-router.put('/api/v1/notes/:note_id/:note_body', (req, res, next) => {
+app.put('/api/v1/notes/:note_id/:note_body', (req, res, next) => {
     const results = [];
     const data = {id: req.params.note_id, body: req.params.note_body};
     // Get a Postgres client from the connection pool
@@ -113,7 +152,7 @@ router.put('/api/v1/notes/:note_id/:note_body', (req, res, next) => {
 
 
 // delete - delete a note
-router.delete('/api/v1/notes/:note_id', (req, res, next) => {
+app.delete('/api/v1/notes/:note_id', (req, res, next) => {
     const results = [];
     // Grab data from the URL parameters
     const id = req.params.note_id;
@@ -146,6 +185,18 @@ router.delete('/api/v1/notes/:note_id', (req, res, next) => {
 
 
 
+}
 
 
-module.exports = router;
+function isLoggedIn(req, res, next) {
+    
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    
+    res.redirect('/');
+}
+
+
+
+//module.exports = router;

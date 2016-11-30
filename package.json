@@ -17,6 +17,15 @@
     "jade": "~1.11.0",
     "morgan": "~1.7.0",
     "pg": "^6.1.0",
+    "ejs" : "~0.8.5",
+    "passport": "~0.2.0",
+    "passport-local": "~1.0.0",
+    "passport-facebook" : "~1.0.2",
+    "passport-twitter" : "~1.0.2",
+    "passport-google-oauth" : "~0.1.5",
+    "connect-flash" : "~0.1.1",
+    "bcrypt-nodejs" : "latest",
+    "express-session": "~1.0.0",
     "serve-favicon": "~2.3.0"
   }
 }
